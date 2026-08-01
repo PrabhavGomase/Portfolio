@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prabhav Gomase — Computer Science Student</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12151c;
+    --surface:#1b1f2a;
+    --surface-2:#20242f;
+    --ink:#e9eaee;
+    --muted:#8b93a7;
+    --amber:#ffb454;
+    --teal:#59d9c4;
+    --line:#2a2f3c;
+    --radius:10px;
+    --mono:'JetBrains Mono', monospace;
+    --sans:'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0/100% 42px,
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--amber);color:#12151c;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px;}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:60;background:rgba(18,21,28,0.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:0.02em;cursor:pointer;}
+  .logo span{color:var(--amber);}
+  .navlinks{display:flex;gap:26px;font-family:var(--mono);font-size:13px;color:var(--muted);}
+  .navlinks a{text-decoration:none;transition:color .15s;position:relative;padding:4px 0;}
+  .navlinks a:hover{color:var(--ink);}
+  .navlinks a.active{color:var(--amber);}
+  .navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--amber);border-radius:2px;}
+  @media (max-width:700px){.navlinks{gap:14px;font-size:11px;}}
+
+  /* PAGE ROUTING */
+  .page{display:none;}
+  .page.active{display:block;animation:pageIn .45s ease;}
+  @keyframes pageIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+  /* REVEAL */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease, transform .6s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  /* HERO with network canvas */
+  .hero{position:relative;padding:100px 0 70px;overflow:hidden;}
+  #netCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:0.55;}
+  .hero .wrap{position:relative;z-index:1;}
+  .eyebrow{font-family:var(--mono);font-size:13px;color:var(--teal);letter-spacing:0.02em;margin-bottom:18px;}
+  .eyebrow::before{content:"// ";color:var(--muted);}
+  h1{font-family:var(--mono);font-weight:800;font-size:clamp(38px,6vw,66px);line-height:1.04;margin:0 0 20px;letter-spacing:-0.01em;}
+  .hero p.lede{font-size:17px;color:var(--muted);max-width:52ch;margin:0 0 28px;}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;padding:12px 20px;border-radius:8px;text-decoration:none;border:1px solid var(--line);transition:all .15s;display:inline-flex;align-items:center;gap:8px;cursor:pointer;background:none;color:var(--ink);}
+  .btn.primary{background:var(--amber);color:#12151c;border-color:var(--amber);}
+  .btn.primary:hover{background:#ffc57a;}
+  .btn.ghost:hover{border-color:var(--muted);}
+
+  .stat-row{display:flex;gap:36px;margin-top:48px;flex-wrap:wrap;}
+  .stat b{font-family:var(--mono);font-size:28px;color:var(--amber);display:block;}
+  .stat span{font-size:12.5px;color:var(--muted);font-family:var(--mono);}
+
+  /* SECTIONS */
+  section{padding:64px 0;border-top:1px solid var(--line);}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:32px;}
+  .sec-num{font-family:var(--mono);color:var(--muted);font-size:13px;}
+  h2{font-family:var(--mono);font-size:26px;margin:0;font-weight:700;}
+  .sec-sub{color:var(--muted);font-size:14.5px;margin:-20px 0 32px;max-width:60ch;}
+
+  /* PREVIEW CARDS (home) */
+  .preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media (max-width:800px){.preview-grid{grid-template-columns:1fr;}}
+  .preview-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;transition:border-color .2s, transform .2s;cursor:pointer;}
+  .preview-card:hover{border-color:var(--teal);transform:translateY(-3px);}
+  .preview-card .ptag{font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:8px;}
+  .preview-card h3{font-family:var(--mono);font-size:16px;margin:0 0 8px;}
+  .preview-card p{font-size:13.5px;color:var(--muted);margin:0;}
+
+  /* EDUCATION card reused on home */
+  .edu-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;max-width:520px;}
+  .edu-card h3{margin:0 0 4px;font-size:16px;font-family:var(--mono);}
+  .edu-card .school{color:var(--teal);font-family:var(--mono);font-size:13px;margin-bottom:14px;}
+  .edu-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:14px;}
+  .edu-meta b{color:var(--amber);font-family:var(--mono);}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);padding:5px 10px;border-radius:20px;}
+
+  /* PROJECTS PAGE: tabs */
+  .tab-row{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+  .tab-btn{font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--line);color:var(--muted);padding:10px 18px;border-radius:8px;cursor:pointer;transition:all .15s;}
+  .tab-btn.active{color:var(--amber);border-color:var(--amber);background:var(--surface-2);}
+  .case{display:none;}
+  .case.active{display:block;animation:pageIn .35s ease;}
+  .case-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+  @media (max-width:820px){.case-grid{grid-template-columns:1fr;}}
+  .case-block{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:18px;}
+  .case-block h4{font-family:var(--mono);font-size:13px;color:var(--teal);margin:0 0 10px;text-transform:uppercase;letter-spacing:.04em;}
+  .case-block p, .case-block li{font-size:14.5px;color:var(--muted);}
+  .case-block ul{margin:0;padding-left:18px;}
+  .stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+
+  .bigo-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;margin-top:6px;}
+  .bigo-table th, .bigo-table td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;color:var(--muted);}
+  .bigo-table th{color:var(--ink);font-weight:600;}
+  .bigo-table td.hi{color:var(--amber);}
+  .bigo-table td.lo{color:var(--teal);}
+
+  .demo-box{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:16px;}
+  .demo-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;}
+  .sort-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  select, .mini-btn{font-family:var(--mono);font-size:12px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:7px 10px;cursor:pointer;}
+  .mini-btn:hover{border-color:var(--teal);}
+  canvas#sortCanvas{width:100%;height:160px;background:var(--bg);border-radius:6px;display:block;}
+  .legend{display:flex;gap:18px;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:10px;height:10px;border-radius:2px;}
+
+  .todo-input-row{display:flex;gap:8px;margin-bottom:10px;}
+  .todo-input-row input{flex:1;font-family:var(--sans);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--ink);}
+  .todo-filters{display:flex;gap:6px;margin-bottom:10px;}
+  .todo-filters button{font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--line);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;}
+  .todo-filters button.active{color:var(--amber);border-color:var(--amber);}
+  .todo-list{list-style:none;margin:0;padding:0;max-height:150px;overflow-y:auto;}
+  .todo-list li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .todo-list li.done span{text-decoration:line-through;color:var(--muted);}
+  .todo-list li button{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;}
+  .todo-list li button:hover{color:var(--amber);}
+  .todo-check{width:14px;height:14px;border:1px solid var(--muted);border-radius:3px;cursor:pointer;flex-shrink:0;}
+  .todo-check.checked{background:var(--teal);border-color:var(--teal);}
+
+  .city-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .city-chip{font-family:var(--mono);font-size:11.5px;background:var(--bg);border:1px solid var(--line);color:var(--muted);padding:6px 12px;border-radius:20px;cursor:pointer;}
+  .city-chip.active{color:var(--amber);border-color:var(--amber);}
+  .weather-display{display:flex;align-items:center;gap:18px;}
+  .weather-temp{font-family:var(--mono);font-size:38px;font-weight:700;color:var(--ink);}
+  .weather-stats{font-size:12.5px;color:var(--muted);font-family:var(--mono);line-height:1.9;}
+
+  /* TIMELINE */
+  .timeline{position:relative;padding-left:32px;}
+  .timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--line);}
+  .t-item{position:relative;margin-bottom:36px;}
+  .t-item::before{content:"";position:absolute;left:-32px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:2px solid var(--amber);}
+  .t-item .t-date{font-family:var(--mono);font-size:12px;color:var(--amber);margin-bottom:4px;}
+  .t-item h3{font-family:var(--mono);font-size:16px;margin:0 0 4px;}
+  .t-item .t-org{color:var(--teal);font-size:13px;font-family:var(--mono);margin-bottom:8px;}
+  .t-item p{color:var(--muted);font-size:14.5px;margin:0;}
+
+  /* NOTES / dev log */
+  .note-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:20px;}
+  .note-card .n-meta{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:8px;}
+  .note-card h3{font-family:var(--mono);font-size:17px;margin:0 0 10px;}
+  .note-card p{color:var(--muted);font-size:14.5px;margin:0 0 8px;}
+  .note-card code{background:var(--surface-2);padding:2px 6px;border-radius:4px;font-size:13px;color:var(--teal);}
+
+  /* SKILLS terminal (used on home) */
+  .skills-term{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-family:var(--mono);font-size:13.5px;overflow:hidden;}
+  .skills-term .term-top{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .term-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:8px;}
+  .skills-term .term-body{padding:20px 24px;}
+  .skill-row{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+  .skill-row .k{color:var(--teal);min-width:150px;}
+  .skill-row .v{color:var(--muted);}
+  .skill-row .v em{color:var(--ink);font-style:normal;}
+
+  /* CONTACT PAGE */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+  @media (max-width:800px){.contact-grid{grid-template-columns:1fr;}}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:6px;}
+  .field input, .field textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 14px;color:var(--ink);font-family:var(--sans);font-size:14px;}
+  .field input:focus, .field textarea:focus{outline:none;border-color:var(--teal);}
+  .field textarea{resize:vertical;min-height:110px;}
+  .form-note{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:14px;}
+  .toast{display:none;font-family:var(--mono);font-size:13px;color:var(--teal);border:1px solid var(--teal);background:rgba(89,217,196,0.08);padding:10px 14px;border-radius:8px;margin-top:14px;}
+  .toast.show{display:block;}
+  .footer-links{display:flex;flex-direction:column;gap:10px;font-family:var(--mono);font-size:13.5px;}
+  .footer-links a{text-decoration:none;color:var(--muted);transition:color .15s;}
+  .footer-links a:hover{color:var(--teal);}
+
+  footer{padding:40px 0;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--muted);opacity:.7;text-align:center;}
+
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important;transition:none !important;} }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo" onclick="location.hash='#home'">PG<span>.</span>dev</div>
+    <div class="navlinks">
+      <a href="#home">home</a>
+      <a href="#projects">projects</a>
+      <a href="#timeline">timeline</a>
+      <a href="#notes">notes</a>
+      <a href="#contact">contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HOME ================= -->
+<div class="page" id="page-home">
+  <header class="hero">
+    <canvas id="netCanvas"></canvas>
+    <div class="wrap">
+      <div class="eyebrow">computer_science_student.ai_ml</div>
+      <h1>Prabhav<br>Gomase</h1>
+      <p class="lede">Building algorithms, interfaces, and the space in between. CS undergrad at VIT specializing in AI &amp; ML — currently deep in data structures, C++, and the occasional 2am LeetCode streak.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#projects">View case studies →</a>
+        <a class="btn ghost" href="https://github.com/PrabhavGomase" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn ghost" href="#contact">Contact</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>9.14</b><span>CGPA</span></div>
+        <div class="stat"><b>100+</b><span>LeetCode solved</span></div>
+        <div class="stat"><b>3</b><span>shipped projects</span></div>
+        <div class="stat"><b>2028</b><span>expected graduation</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">01</span><h2>About</h2></div>
+      <p class="sec-sub reveal" style="margin-top:-20px;">A quick summary before you dig into the case studies.</p>
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:36px;" class="reveal">
+        <p style="color:var(--muted);font-size:15.5px;max-width:60ch;">I'm a Computer Science student interested in data structures, algorithmic problem solving, and building interactive web applications through practical projects. I like taking ideas — a sorting algorithm, a weather API, a to-do list — and turning them into something you can actually click around in. Based in Katpadi, Tamil Nadu, India.</p>
+        <div class="edu-card">
+          <div class="school">Vellore Institute of Technology (VIT), Vellore</div>
+          <h3>B.Tech, Computer Science &amp; Engineering (AI &amp; ML)</h3>
+          <div class="edu-meta"><span>Expected Graduation: 2028</span><span>CGPA: <b>9.14</b></span></div>
+          <div class="tags">
+            <span class="tag">Data Structures</span><span class="tag">OOP</span><span class="tag">Web Development</span><span class="tag">Machine Learning</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">02</span><h2>Featured work</h2></div>
+      <div class="preview-grid">
+        <div class="preview-card reveal" onclick="location.hash='#projects'; setTimeout(()=>selectTab('sorting'),50);">
+          <div class="ptag">01 / algorithms</div>
+          <h3>Sorting Visualizer</h3>
+          <p>Five sorting algorithms, animated bar-by-bar, with adjustable speed and size.</p>
+        </div>
+        <div class="preview-card reveal" onclick="location.hash='#projects'; setTimeout(()=>selectTab('tasks'),50);">
+          <div class="ptag">02 / state management</div>
+          <h3>Task Manager</h3>
+          <p>Add, complete, filter, and persist tasks entirely client-side with LocalStorage.</p>
+        </div>
+        <div class="preview-card reveal" onclick="location.hash='#projects'; setTimeout(()=>selectTab('weather'),50);">
+          <div class="ptag">03 / async apis</div>
+          <h3>Weather Dashboard</h3>
+          <p>Live city weather via the OpenWeather API using async Fetch calls.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">03</span><h2>Skills</h2></div>
+      <div class="skills-term reveal">
+        <div class="term-top"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span class="term-label">~/skills --list</span></div>
+        <div class="term-body">
+          <div class="skill-row"><span class="k">languages</span><span class="v"><em>C++</em>, <em>JavaScript</em></span></div>
+          <div class="skill-row"><span class="k">web</span><span class="v"><em>HTML</em>, <em>CSS</em></span></div>
+          <div class="skill-row"><span class="k">core cs</span><span class="v"><em>Data Structures</em>, <em>Object-Oriented Programming</em></span></div>
+          <div class="skill-row"><span class="k">tools</span><span class="v"><em>Git</em>, <em>VS Code</em></span></div>
+          <div class="skill-row"><span class="k">certifications</span><span class="v"><em>Supervised Machine Learning: Regression and Classification</em> — Stanford Online &amp; DeepLearning.AI (Coursera)</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= PROJECTS ================= -->
+<div class="page" id="page-projects">
+  <section style="border-top:none;">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">02</span><h2>Case studies</h2></div>
+      <p class="sec-sub reveal" style="margin-top:-20px;">A closer look at what each project does and how it's built. Every demo below is live — click around.</p>
+
+      <div class="tab-row reveal">
+        <button class="tab-btn active" data-tab="sorting" onclick="selectTab('sorting')">01 · Sorting Visualizer</button>
+        <button class="tab-btn" data-tab="tasks" onclick="selectTab('tasks')">02 · Task Manager</button>
+        <button class="tab-btn" data-tab="weather" onclick="selectTab('weather')">03 · Weather Dashboard</button>
+      </div>
+
+      <!-- CASE: Sorting -->
+      <div class="case active" id="case-sorting">
+        <div class="case-grid">
+          <div>
+            <div class="case-block">
+              <h4>Problem</h4>
+              <p>Sorting algorithms are usually taught as pseudocode — hard to build intuition for how they actually behave on real data, and why one outperforms another.</p>
+            </div>
+            <div class="case-block">
+              <h4>Approach</h4>
+              <ul>
+                <li>Render an array as bars on a canvas, redrawing on every comparison/swap.</li>
+                <li>Implemented Bubble, Selection, Insertion, Merge, and Quick Sort as step-by-step generators so each comparison is visible.</li>
+                <li>Adjustable array size and animation speed to compare algorithm behavior at different scales.</li>
+              </ul>
+            </div>
+            <div class="case-block">
+              <h4>Complexity</h4>
+              <table class="bigo-table">
+                <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th></tr>
+                <tr><td>Bubble</td><td class="lo">O(n)</td><td class="hi">O(n²)</td><td class="hi">O(n²)</td></tr>
+                <tr><td>Selection</td><td class="hi">O(n²)</td><td class="hi">O(n²)</td><td class="hi">O(n²)</td></tr>
+                <tr><td>Insertion</td><td class="lo">O(n)</td><td class="hi">O(n²)</td><td class="hi">O(n²)</td></tr>
+                <tr><td>Merge</td><td class="lo">O(n log n)</td><td class="lo">O(n log n)</td><td class="lo">O(n log n)</td></tr>
+                <tr><td>Quick</td><td class="lo">O(n log n)</td><td class="lo">O(n log n)</td><td class="hi">O(n²)</td></tr>
+              </table>
+              <div class="stack"><span class="tag">JavaScript</span><span class="tag">Canvas</span><span class="tag">HTML/CSS</span></div>
+            </div>
+          </div>
+          <div class="demo-box" style="position:sticky;top:80px;">
+            <div class="demo-label">Live demo</div>
+            <div class="sort-controls">
+              <select id="algoSelect">
+                <option value="bubble">Bubble Sort</option>
+                <option value="selection">Selection Sort</option>
+                <option value="insertion">Insertion Sort</option>
+                <option value="merge">Merge Sort</option>
+                <option value="quick">Quick Sort</option>
+              </select>
+              <input type="range" id="speedRange" min="5" max="80" value="35" title="Speed">
+              <button class="mini-btn" id="shuffleBtn">Shuffle</button>
+              <button class="mini-btn" id="runBtn">Run ▶</button>
+            </div>
+            <canvas id="sortCanvas"></canvas>
+            <div class="legend">
+              <span><span class="swatch" style="background:var(--amber)"></span>comparing</span>
+              <span><span class="swatch" style="background:var(--teal)"></span>sorted</span>
+              <span><span class="swatch" style="background:var(--muted)"></span>unsorted</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE: Tasks -->
+      <div class="case" id="case-tasks">
+        <div class="case-grid">
+          <div>
+            <div class="case-block">
+              <h4>Problem</h4>
+              <p>Most to-do app tutorials skip persistence — refresh the page and everything's gone.</p>
+            </div>
+            <div class="case-block">
+              <h4>Approach</h4>
+              <ul>
+                <li>Add, delete, and mark tasks complete with a minimal, responsive interface.</li>
+                <li>Task filtering across All / Pending / Completed views.</li>
+                <li>State persisted to LocalStorage so tasks survive a page reload.</li>
+              </ul>
+            </div>
+            <div class="case-block">
+              <h4>Implementation note</h4>
+              <p>Filtering is derived, not stored — the task list is the single source of truth, and the active filter just changes which items get rendered from it. That keeps <code>add</code>, <code>toggle</code>, and <code>delete</code> simple and avoids duplicated state going out of sync.</p>
+              <div class="stack"><span class="tag">JavaScript</span><span class="tag">LocalStorage</span><span class="tag">CSS</span></div>
+            </div>
+          </div>
+          <div class="demo-box" style="position:sticky;top:80px;">
+            <div class="demo-label">Live demo</div>
+            <div class="todo-input-row">
+              <input type="text" id="todoInput" placeholder="Add a task...">
+              <button class="mini-btn" id="todoAdd">Add</button>
+            </div>
+            <div class="todo-filters">
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="pending">Pending</button>
+              <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+            <ul class="todo-list" id="todoList"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE: Weather -->
+      <div class="case" id="case-weather">
+        <div class="case-grid">
+          <div>
+            <div class="case-block">
+              <h4>Problem</h4>
+              <p>Weather data is only useful if it's current — the dashboard needed to fetch on demand rather than ship with stale numbers baked in.</p>
+            </div>
+            <div class="case-block">
+              <h4>Approach</h4>
+              <ul>
+                <li>City input triggers an async call to the OpenWeather API.</li>
+                <li>Displays temperature, humidity, and wind speed once the response resolves.</li>
+                <li>Built entirely on the Fetch API — no external HTTP library.</li>
+              </ul>
+            </div>
+            <div class="case-block">
+              <h4>Implementation note</h4>
+              <p>This embedded demo uses sample data instead of a live key, so it works without configuration. The real project's fetch layer wraps each request in a try/catch and shows a fallback message on a failed lookup or bad city name, rather than leaving the UI blank.</p>
+              <div class="stack"><span class="tag">JavaScript</span><span class="tag">OpenWeather API</span><span class="tag">Fetch</span></div>
+            </div>
+          </div>
+          <div class="demo-box" style="position:sticky;top:80px;">
+            <div class="demo-label">Sample output</div>
+            <div class="city-row" id="cityRow"></div>
+            <div class="weather-display">
+              <div class="weather-temp" id="wTemp">28°C</div>
+              <div class="weather-stats" id="wStats">humidity: 64%<br>wind: 11 km/h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- ================= TIMELINE ================= -->
+<div class="page" id="page-timeline">
+  <section style="border-top:none;">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">03</span><h2>Timeline</h2></div>
+      <p class="sec-sub reveal" style="margin-top:-20px;">Education, practice, and milestones, in order.</p>
+      <div class="timeline">
+        <div class="t-item reveal">
+          <div class="t-date">2024 — 2028 (expected)</div>
+          <h3>B.Tech, Computer Science &amp; Engineering (AI &amp; ML)</h3>
+          <div class="t-org">Vellore Institute of Technology (VIT), Vellore</div>
+          <p>Coursework in Data Structures, Object-Oriented Programming, Web Development, and Machine Learning. Current CGPA: 9.14.</p>
+        </div>
+        <div class="t-item reveal">
+          <div class="t-date">Ongoing</div>
+          <h3>Data Structures &amp; Algorithms Practice</h3>
+          <div class="t-org">Self-directed</div>
+          <p>100+ problems solved on LeetCode, focused on arrays, strings, and hashing — practiced primarily in C++.</p>
+        </div>
+        <div class="t-item reveal">
+          <div class="t-date">Hackathon</div>
+          <h3>Hackademia — College Survival Edition</h3>
+          <div class="t-org">IoThinc Club</div>
+          <p>Collaborated with a team to design and prototype a solution for student life challenges under time constraints.</p>
+        </div>
+        <div class="t-item reveal">
+          <div class="t-date">Certification</div>
+          <h3>Supervised Machine Learning: Regression and Classification</h3>
+          <div class="t-org">Stanford Online &amp; DeepLearning.AI — Coursera</div>
+          <p>Foundational coursework in supervised learning methods.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= NOTES ================= -->
+<div class="page" id="page-notes">
+  <section style="border-top:none;">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">04</span><h2>Notes</h2></div>
+      <p class="sec-sub reveal" style="margin-top:-20px;">Short write-ups on things I ran into while building the projects above. Starter entries — edit freely.</p>
+
+      <div class="note-card reveal">
+        <div class="n-meta">DEV LOG · SORTING VISUALIZER</div>
+        <h3>Why Quick Sort still beats Bubble Sort in practice</h3>
+        <p>On paper, Bubble and Quick Sort both degrade to <code>O(n²)</code> in the worst case. The difference shows up in the visualizer at larger array sizes: Quick Sort's partitioning does far fewer comparisons on already-scattered data, while Bubble Sort keeps re-scanning the same range. Watching it animate makes the average-case gap obvious in a way the Big-O notation alone doesn't.</p>
+      </div>
+      <div class="note-card reveal">
+        <div class="n-meta">DEV LOG · TASK MANAGER</div>
+        <h3>Filtering state without a framework</h3>
+        <p>The easy mistake with an All/Pending/Completed filter is storing three separate lists and trying to keep them in sync. Keeping one array as the source of truth and computing the filtered view on render removed an entire class of bugs — at the cost of re-filtering on every render, which is irrelevant at this scale.</p>
+      </div>
+      <div class="note-card reveal">
+        <div class="n-meta">DEV LOG · WEATHER DASHBOARD</div>
+        <h3>Handling a Fetch call that can fail</h3>
+        <p>An async weather lookup can fail in more ways than it can succeed: bad city name, network drop, rate limit. Wrapping the fetch in try/catch and giving the UI an explicit "couldn't find that city" state — instead of silently leaving the previous result on screen — made the dashboard feel a lot more trustworthy.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= CONTACT ================= -->
+<div class="page" id="page-contact">
+  <section style="border-top:none;">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">05</span><h2>Contact</h2></div>
+      <div class="contact-grid">
+        <div class="reveal">
+          <p style="color:var(--muted);font-size:15px;max-width:46ch;">Open to internships, collaborations, and interesting problems. Reach out directly, or use the form — it'll open your mail client with the message pre-filled.</p>
+          <div class="footer-links" style="margin-top:24px;">
+            <a href="mailto:prabhavtg@gmail.com">prabhavtg@gmail.com</a>
+            <a href="tel:+918291321598">+91 82913 21598</a>
+            <a href="https://github.com/PrabhavGomase" target="_blank" rel="noopener">github.com/PrabhavGomase</a>
+            <a href="https://linkedin.com/in/prabhav-gomase-20258a375" target="_blank" rel="noopener">linkedin.com/in/prabhav-gomase</a>
+            <span style="color:var(--muted);">Katpadi, Tamil Nadu, India</span>
+          </div>
+        </div>
+        <form class="reveal" id="contactForm">
+          <div class="field"><label>Name</label><input type="text" id="cName" required></div>
+          <div class="field"><label>Email</label><input type="email" id="cEmail" required></div>
+          <div class="field"><label>Message</label><textarea id="cMessage" required></textarea></div>
+          <button type="submit" class="btn primary">Send message</button>
+          <div class="toast" id="toast">✓ Opening your mail client...</div>
+          <div class="form-note">// this opens a mailto: link — no data is stored or sent anywhere else</div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>// built with data structures, patience, and one too many recompiles</footer>
+
+<script>
+/* ---------------- Router ---------------- */
+function navigate(){
+  const hash = location.hash.replace('#','') || 'home';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target = document.getElementById('page-'+hash);
+  (target || document.getElementById('page-home')).classList.add('active');
+  document.querySelectorAll('.navlinks a').forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('href')==='#'+hash);
+  });
+  window.scrollTo(0,0);
+  setTimeout(initReveal, 30);
+}
+window.addEventListener('hashchange', navigate);
+window.addEventListener('DOMContentLoaded', navigate);
+
+/* ---------------- Scroll reveal ---------------- */
+let revealObserver;
+function initReveal(){
+  if(revealObserver) revealObserver.disconnect();
+  revealObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold:0.12});
+  document.querySelectorAll('.page.active .reveal').forEach(el=>revealObserver.observe(el));
+}
+
+/* ---------------- Project tabs ---------------- */
+function selectTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  document.querySelectorAll('.case').forEach(c=>c.classList.toggle('active', c.id==='case-'+name));
+}
+
+/* ---------------- Hero network graph ---------------- */
+(function(){
+  const canvas = document.getElementById('netCanvas');
+  const ctx = canvas.getContext('2d');
+  let W,H, nodes=[];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){
+    W = canvas.width = canvas.clientWidth*devicePixelRatio;
+    H = canvas.height = canvas.clientHeight*devicePixelRatio;
+  }
+  function init(){
+    resize();
+    const count = Math.max(18, Math.floor(W*H/140000));
+    nodes = Array.from({length:count}, ()=>({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-0.5)*0.25, vy:(Math.random()-0.5)*0.25
+    }));
+  }
+  window.addEventListener('resize', init);
+  init();
+
+  function step(){
+    nodes.forEach(n=>{
+      n.x+=n.vx; n.y+=n.vy;
+      if(n.x<0||n.x>W) n.vx*=-1;
+      if(n.y<0||n.y>H) n.vy*=-1;
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--line');
+    const tealColor = getComputedStyle(document.documentElement).getPropertyValue('--teal');
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<140*devicePixelRatio){
+          ctx.strokeStyle = lineColor;
+          ctx.globalAlpha = 1-(dist/(140*devicePixelRatio));
+          ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y); ctx.stroke();
+        }
+      }
+    }
+    ctx.globalAlpha=1;
+    nodes.forEach(n=>{
+      ctx.fillStyle = tealColor;
+      ctx.beginPath(); ctx.arc(n.x,n.y,2.5*devicePixelRatio,0,Math.PI*2); ctx.fill();
+    });
+  }
+  function loop(){
+    if(!reduced) step();
+    draw();
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ---------------- Sorting demo (bubble/selection/insertion/merge/quick) ---------------- */
+(function(){
+  const canvas = document.getElementById('sortCanvas');
+  const ctx = canvas.getContext('2d');
+  const algoSelect = document.getElementById('algoSelect');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  const runBtn = document.getElementById('runBtn');
+  const speedRange = document.getElementById('speedRange');
+  let W,H;
+  function resize(){ W=canvas.width=canvas.clientWidth*devicePixelRatio; H=canvas.height=canvas.clientHeight*devicePixelRatio; }
+  resize(); window.addEventListener('resize', resize);
+
+  const M = 24;
+  let data = [];
+  function shuffle(){ data = Array.from({length:M}, ()=>({v:Math.random()*0.85+0.1,state:'idle'})); render(); }
+  shuffle();
+  let running=false;
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    const barW=W/data.length;
+    data.forEach((item,i)=>{
+      let color=getComputedStyle(document.documentElement).getPropertyValue('--muted');
+      if(item.state==='compare') color=getComputedStyle(document.documentElement).getPropertyValue('--amber');
+      if(item.state==='sorted') color=getComputedStyle(document.documentElement).getPropertyValue('--teal');
+      ctx.fillStyle=color;
+      const h=item.v*H*0.9;
+      ctx.fillRect(i*barW+2, H-h, barW-4, h);
+    });
+  }
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function speed(){ return 90 - speedRange.value; }
+
+  async function bubbleSort(){
+    for(let i=0;i<data.length && running;i++){
+      for(let j=0;j<data.length-i-1 && running;j++){
+        data.forEach(d=>{ if(d.state!=='sorted') d.state='idle'; });
+        data[j].state='compare'; data[j+1].state='compare';
+        render(); await sleep(speed());
+        if(data[j].v>data[j+1].v){ [data[j],data[j+1]]=[data[j+1],data[j]]; }
+      }
+      data[data.length-1-i].state='sorted';
+    }
+    data.forEach(d=>d.state='sorted'); render();
+  }
+  async function selectionSort(){
+    for(let i=0;i<data.length && running;i++){
+      let min=i;
+      for(let j=i+1;j<data.length && running;j++){
+        data.forEach(d=>{ if(d.state!=='sorted') d.state='idle'; });
+        for(let k=0;k<i;k++) data[k].state='sorted';
+        data[j].state='compare'; data[min].state='compare';
+        render(); await sleep(speed());
+        if(data[j].v<data[min].v) min=j;
+      }
+      [data[i],data[min]]=[data[min],data[i]];
+      data[i].state='sorted';
+    }
+    data.forEach(d=>d.state='sorted'); render();
+  }
+  async function insertionSort(){
+    for(let i=1;i<data.length && running;i++){
+      let j=i;
+      while(j>0 && data[j-1].v>data[j].v && running){
+        data.forEach(d=>d.state='idle');
+        data[j].state='compare'; data[j-1].state='compare';
+        render(); await sleep(speed());
+        [data[j],data[j-1]]=[data[j-1],data[j]];
+        j--;
+      }
+    }
+    data.forEach(d=>d.state='sorted'); render();
+  }
+  async function mergeSortRange(lo,hi){
+    if(lo>=hi || !running) return;
+    const mid=Math.floor((lo+hi)/2);
+    await mergeSortRange(lo,mid);
+    await mergeSortRange(mid+1,hi);
+    if(!running) return;
+    let left=data.slice(lo,mid+1), right=data.slice(mid+1,hi+1);
+    let i=0,j=0,k=lo;
+    while(i<left.length && j<right.length && running){
+      data.forEach(d=>{ if(d.state!=='sorted') d.state='idle'; });
+      data[k] = left[i].v<=right[j].v ? left[i++] : right[j++];
+      data[k].state='compare';
+      render(); await sleep(speed());
+      k++;
+    }
+    while(i<left.length && running){ data[k]=left[i++]; k++; }
+    while(j<right.length && running){ data[k]=right[j++]; k++; }
+    for(let x=lo;x<=hi;x++) data[x].state='sorted';
+    render();
+  }
+  async function quickSort(lo=0,hi=data.length-1){
+    if(lo>=hi || !running){ return; }
+    let pivot=data[hi].v, i=lo;
+    for(let j=lo;j<hi && running;j++){
+      data.forEach(d=>{ if(d.state!=='sorted') d.state='idle'; });
+      data[j].state='compare'; data[hi].state='compare';
+      render(); await sleep(speed());
+      if(data[j].v<pivot){ [data[i],data[j]]=[data[j],data[i]]; i++; }
+    }
+    [data[i],data[hi]]=[data[hi],data[i]];
+    data[i].state='sorted'; render();
+    await quickSort(lo,i-1);
+    await quickSort(i+1,hi);
+  }
+
+  runBtn.addEventListener('click', async ()=>{
+    if(running) return;
+    running=true;
+    data.forEach(d=>d.state='idle');
+    const algo=algoSelect.value;
+    if(algo==='bubble') await bubbleSort();
+    else if(algo==='selection') await selectionSort();
+    else if(algo==='insertion') await insertionSort();
+    else if(algo==='merge') await mergeSortRange(0,data.length-1);
+    else if(algo==='quick') await quickSort();
+    data.forEach(d=>d.state='sorted'); render();
+    running=false;
+  });
+  shuffleBtn.addEventListener('click', ()=>{ running=false; shuffle(); });
+})();
+
+/* ---------------- Todo demo ---------------- */
+(function(){
+  let tasks = [
+    {text:'Review sorting visualizer edge cases', done:true},
+    {text:'Refactor task filter logic', done:false},
+    {text:'Style responsive breakpoints', done:false}
+  ];
+  let filter='all';
+  const list=document.getElementById('todoList');
+  const input=document.getElementById('todoInput');
+  const addBtn=document.getElementById('todoAdd');
+  function render(){
+    list.innerHTML='';
+    const filtered = tasks.filter(t=> filter==='pending' ? !t.done : filter==='completed' ? t.done : true);
+    filtered.forEach(t=>{
+      const idx=tasks.indexOf(t);
+      const li=document.createElement('li');
+      li.className = t.done?'done':'';
+      li.innerHTML = `<span class="todo-check ${t.done?'checked':''}" data-idx="${idx}"></span><span>${t.text}</span><button data-idx="${idx}">✕</button>`;
+      list.appendChild(li);
+    });
+  }
+  render();
+  list.addEventListener('click',(e)=>{
+    if(e.target.classList.contains('todo-check')){ tasks[e.target.dataset.idx].done=!tasks[e.target.dataset.idx].done; render(); }
+    if(e.target.tagName==='BUTTON'){ tasks.splice(e.target.dataset.idx,1); render(); }
+  });
+  addBtn.addEventListener('click',()=>{
+    const val=input.value.trim();
+    if(val){ tasks.push({text:val,done:false}); input.value=''; render(); }
+  });
+  input.addEventListener('keydown',(e)=>{ if(e.key==='Enter') addBtn.click(); });
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); filter=btn.dataset.filter; render();
+    });
+  });
+})();
+
+/* ---------------- Weather demo ---------------- */
+(function(){
+  const cities = {'Vellore':{temp:31,humidity:58,wind:9},'Chennai':{temp:33,humidity:71,wind:14},'Bengaluru':{temp:24,humidity:63,wind:11},'Delhi':{temp:36,humidity:41,wind:7}};
+  const cityRow=document.getElementById('cityRow');
+  const wTemp=document.getElementById('wTemp');
+  const wStats=document.getElementById('wStats');
+  Object.keys(cities).forEach((city,i)=>{
+    const chip=document.createElement('span');
+    chip.className='city-chip'+(i===0?' active':'');
+    chip.textContent=city;
+    chip.addEventListener('click',()=>{
+      document.querySelectorAll('.city-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      const d=cities[city];
+      wTemp.textContent=d.temp+'°C';
+      wStats.innerHTML=`humidity: ${d.humidity}%<br>wind: ${d.wind} km/h`;
+    });
+    cityRow.appendChild(chip);
+  });
+  const first=cities['Vellore'];
+  wTemp.textContent=first.temp+'°C';
+  wStats.innerHTML=`humidity: ${first.humidity}%<br>wind: ${first.wind} km/h`;
+})();
+
+/* ---------------- Contact form (mailto, no backend) ---------------- */
+(function(){
+  const form=document.getElementById('contactForm');
+  const toast=document.getElementById('toast');
+  form.addEventListener('submit',(e)=>{
+    e.preventDefault();
+    const name=document.getElementById('cName').value;
+    const email=document.getElementById('cEmail').value;
+    const message=document.getElementById('cMessage').value;
+    const subject=encodeURIComponent(`Portfolio contact from ${name}`);
+    const body=encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+    toast.classList.add('show');
+    setTimeout(()=>{ window.location.href = `mailto:prabhavtg@gmail.com?subject=${subject}&body=${body}`; }, 500);
+  });
+})();
+</script>
+
+</body>
+</html>
