@@ -7,6 +7,7 @@ A responsive portfolio for Prabhav Gomase, a Computer Science and Engineering st
 - Dark and light themes with a saved preference
 - Project filters and accessible project-detail dialogs
 - Quick navigation with Ctrl+K or Command+K, arrow keys, and Enter
+- Interactive RegexLab preview with regex compilation, a minimized DFA diagram, tokens, and animated string matching
 - Sorting playground featuring Bubble, Selection, Insertion, Merge, and Quick Sort
 - Adjustable array size and speed, pause/resume, and live comparison and write counts
 - Responsive navigation, reading progress, reveal animations, reduced-motion support, and print styles
@@ -18,7 +19,7 @@ A responsive portfolio for Prabhav Gomase, a Computer Science and Engineering st
 - [RegexLab](https://github.com/PrabhavGomase/regex-to-dfa-compiler) — completed C++ regex-to-DFA compiler pipeline with DFA minimization
 - [Weather Dashboard, Task Manager, and Sorting Visualizer](https://github.com/PrabhavGomase/Web-Dev-Projects) — web development projects
 
-Project-card illustrations are visual concepts rather than screenshots of deployed applications. The embedded sorting playground is an independent portfolio interaction inspired by the Sorting Visualizer project.
+Campus Repair Café and the smaller project-card illustrations are visual concepts rather than screenshots of deployed applications. RegexLab includes an independent JavaScript browser demo supporting literals, concatenation, alternation, grouping, escapes, and the `*`, `+`, and `?` operators. This demo does not call the C++ repository. Expressions are limited to 64 characters and 64 DFA states to keep the preview responsive. The embedded sorting playground is an independent portfolio interaction inspired by the Sorting Visualizer project.
 
 ## Local preview
 
@@ -37,6 +38,9 @@ Open http://localhost:8000. You can also open `index.html` directly, although cl
 | `index.html` | Page content and project cards |
 | `styles.css` | Colors, typography, layout, and responsive styles |
 | `app.js` | Project details, navigation, themes, and sorting interactions |
+| `regex-engine.js` | Browser demo: parsing, Thompson NFA, DFA construction, minimization, and matching |
+| `regex-ui.js` | RegexLab preview controls, diagrams, tokens, and animated traces |
+| `regex-ui.css` | Interactive compiler studio styling |
 | `assets/Prabhav_Gomase_Resume.docx` | Downloadable résumé |
 | `assets/favicon.svg` | Browser icon |
 

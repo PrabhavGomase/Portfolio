@@ -49,7 +49,7 @@ const projects = {
     summary: 'A C++ compiler that transforms regular expressions into minimized deterministic finite automata through a complete lexer-to-minimizer pipeline.',
     tags: ['C++', 'Compiler design', 'Automata theory', 'Algorithms'], heading: 'What it does',
     points: ['Tokenizes expressions, parses them with recursive descent, and builds an abstract syntax tree.', 'Constructs a Thompson ε-NFA, then derives a DFA using ε-closure and subset construction.', 'Minimizes the DFA and prints the tokens, AST, ε-NFA, DFA, and minimized DFA for inspection.', 'Supports literals, concatenation, union, Kleene star, plus, optional, grouping, and escaped characters.'],
-    note: 'The project illustration is an automata study, rather than an application screenshot. See the repository for build instructions and examples.',
+    note: 'This portfolio preview compiles expressions locally in your browser. The linked repository contains the C++ implementation.',
     repository: 'https://github.com/PrabhavGomase/regex-to-dfa-compiler'
   },
   weather: {
